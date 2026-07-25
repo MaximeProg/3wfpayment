@@ -31,8 +31,9 @@ Les endpoints de liste (`GET /v1/deposits`, `/v1/withdrawals`, `/v1/crypto-sends
 
 ## Exemple : liste des transactions d'un projet
 
-```
-GET /v1/transactions?limit=10
+```bash
+curl "https://threewfpayment.onrender.com/v1/transactions?limit=10" \
+  -H "Authorization: Bearer <token>"
 ```
 
 ```json

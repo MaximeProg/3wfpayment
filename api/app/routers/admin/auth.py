@@ -27,7 +27,7 @@ async def login(
         value=token,
         httponly=True,
         secure=settings.is_production,
-        samesite="lax",
+        samesite="none" if settings.is_production else "lax",
         max_age=settings.admin_session_expire_minutes * 60,
         path="/",
     )

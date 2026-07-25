@@ -2,9 +2,9 @@
 
 L'API expose une documentation OpenAPI auto-generee et toujours synchronisee avec le code deploye :
 
-- Swagger UI : `$PAYMENT_PLATFORM_URL/docs`
-- ReDoc : `$PAYMENT_PLATFORM_URL/redoc`
-- Schema brut : `$PAYMENT_PLATFORM_URL/openapi.json`
+- Swagger UI : [https://threewfpayment.onrender.com/docs](https://threewfpayment.onrender.com/docs)
+- ReDoc : [https://threewfpayment.onrender.com/redoc](https://threewfpayment.onrender.com/redoc)
+- Schema brut : [https://threewfpayment.onrender.com/openapi.json](https://threewfpayment.onrender.com/openapi.json)
 
 Utile pour explorer les schemas exacts (types, champs optionnels) sans dependre de ce guide si un doute persiste.
 

@@ -2,6 +2,28 @@ Un depot = un utilisateur final envoie de l'argent vers le wallet Yellow Card du
 
 ## `POST /v1/deposits` — scope `deposits:write`
 
+```bash
+curl -X POST "https://threewfpayment.onrender.com/v1/deposits" \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "client_reference": "doc-example-dep-003",
+    "customer_uid": "doc-user-001",
+    "customer_type": "retail",
+    "local_amount": 1000,
+    "currency": "KES",
+    "channel_id": "96ee8110-d1c2-4606-8d27-05c2aa6a4f98",
+    "source_account_type": "momo",
+    "source_account_number": "+254712345678",
+    "source_network_id": "19fc0dd0-0da7-4050-9ab6-8b7d05ed5ccd",
+    "recipient": {"name": "Jane Doe", "country": "KE", "phone": "+254712345678"},
+    "reason": "other",
+    "force_accept": true
+  }'
+```
+
+Corps complet de la requete :
+
 ```json
 {
   "client_reference": "doc-example-dep-003",
@@ -80,6 +102,16 @@ Numero de telephone sans indicatif international :
 
 ## `GET /v1/deposits/{id}` et `GET /v1/deposits` — scope `transactions:read`
 
+```bash
+curl "https://threewfpayment.onrender.com/v1/deposits/5a705bf9-e8a5-42f8-b886-14134440283d" \
+  -H "Authorization: Bearer <token>"
+```
+
 `GET /v1/deposits/{id}` declenche automatiquement un rafraichissement du statut aupres de Yellow Card si la transaction n'est pas encore dans un etat terminal (voir [Statuts & transactions](/docs/transactions)) — c'est le mecanisme de secours en l'absence de webhook.
 
-`GET /v1/deposits?status=completed&limit=50&offset=0` liste les depots du projet, filtrable par `status`.
+```bash
+curl "https://threewfpayment.onrender.com/v1/deposits?status=completed&limit=50&offset=0" \
+  -H "Authorization: Bearer <token>"
+```
+
+Liste les depots du projet, filtrable par `status`.

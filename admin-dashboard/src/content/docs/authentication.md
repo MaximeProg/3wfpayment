@@ -1,15 +1,14 @@
 Payment Platform n'utilise **pas OAuth**. Le flux est :
 
 1. Vous detenez une cle API complete (`pp_<prefix>_<secret>`), obtenue une seule fois a la creation ([Obtenir un projet et une cle API](/docs/getting-started)).
-2. Vous l'echangez contre un **token JWT court** via `POST /v1/auth/token`.
+2. Vous l'echangez contre un **token JWT court** via `POST https://threewfpayment.onrender.com/v1/auth/token`.
 3. Vous utilisez ce token en `Authorization: Bearer <token>` sur tous les appels `/v1/*` suivants.
 4. Le token expire au bout de **15 minutes** (`expires_in: 900`) — re-echangez votre cle API pour en obtenir un nouveau. Ne cachez pas le token plus longtemps ; re-echangez proactivement (ex. des qu'il reste moins d'une minute) plutot que d'attendre un `401`.
 
-```http
-POST /v1/auth/token
-Content-Type: application/json
-
-{"api_key": "pp_<prefix>_<secret>"}
+```bash
+curl -X POST "https://threewfpayment.onrender.com/v1/auth/token" \
+  -H "Content-Type: application/json" \
+  -d '{"api_key": "pp_<prefix>_<secret>"}'
 ```
 
 ```json

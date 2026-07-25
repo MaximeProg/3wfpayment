@@ -2,7 +2,7 @@
 
 - Aucune limite de debit (rate limiting) n'est actuellement appliquee par Payment Platform. Restez raisonnable dans le volume d'appels — une limite pourra etre introduite plus tard sans preavis si necessaire.
 - Aucun SLA formel n'existe a ce stade (produit interne early-stage). En cas d'incident, contactez [l'equipe plateforme](/docs/resources).
-- `GET /health` et `GET /health/ready` (hors `/v1`) exposent l'etat de sante de l'API pour vos propres checks amont si besoin.
+- `GET https://threewfpayment.onrender.com/health` et `GET https://threewfpayment.onrender.com/health/ready` (hors `/v1`, pas d'authentification requise) exposent l'etat de sante de l'API pour vos propres checks amont si besoin.
 
 ## Securite
 

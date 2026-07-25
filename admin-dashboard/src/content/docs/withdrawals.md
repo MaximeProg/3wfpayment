@@ -2,6 +2,29 @@ Un retrait = le produit envoie de l'argent depuis le wallet Yellow Card vers un 
 
 ## `POST /v1/withdrawals` — scope `withdrawals:write`
 
+```bash
+curl -X POST "https://threewfpayment.onrender.com/v1/withdrawals" \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "client_reference": "doc-example-wdr-001",
+    "customer_uid": "doc-user-001",
+    "customer_type": "retail",
+    "local_amount": 500,
+    "currency": "KES",
+    "channel_id": "b00b21eb-7fa2-417d-b558-ed108ae2ba1d",
+    "reason": "other",
+    "destination_account_type": "momo",
+    "destination_account_number": "+254712345678",
+    "destination_account_name": "Jane Doe",
+    "destination_network_id": "19fc0dd0-0da7-4050-9ab6-8b7d05ed5ccd",
+    "sender": {"name": "Jane Doe", "country": "KE", "phone": "+254712345678"},
+    "force_accept": true
+  }'
+```
+
+Corps complet de la requete :
+
 ```json
 {
   "client_reference": "doc-example-wdr-001",
@@ -49,4 +72,13 @@ Reponse `201` :
 }
 ```
 
-`reason` est **requis** pour un retrait (contrairement au depot ou il a une valeur par defaut). `GET /v1/withdrawals/{id}` et `GET /v1/withdrawals` fonctionnent comme pour les depots (voir [Statuts & transactions](/docs/transactions)).
+`reason` est **requis** pour un retrait (contrairement au depot ou il a une valeur par defaut).
+
+## `GET /v1/withdrawals/{id}` et `GET /v1/withdrawals` — scope `transactions:read`
+
+```bash
+curl "https://threewfpayment.onrender.com/v1/withdrawals?status=pending&limit=50&offset=0" \
+  -H "Authorization: Bearer <token>"
+```
+
+Fonctionnent comme pour les depots (voir [Statuts & transactions](/docs/transactions)).

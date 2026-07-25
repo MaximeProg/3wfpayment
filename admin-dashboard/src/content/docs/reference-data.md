@@ -4,6 +4,11 @@ Tous les endpoints ci-dessous necessitent le header `Authorization: Bearer <toke
 
 ## `GET /v1/countries`
 
+```bash
+curl "https://threewfpayment.onrender.com/v1/countries" \
+  -H "Authorization: Bearer <token>"
+```
+
 ```json
 [
   {"id": "b661bb73-fcbf-45cb-b317-79db87a1b3d2", "iso_code": "KE", "name": "Kenya", "is_active": true, "synced_at": "2026-07-24T18:23:01Z"}
@@ -13,6 +18,11 @@ Tous les endpoints ci-dessous necessitent le header `Authorization: Bearer <toke
 ## `GET /v1/networks`
 
 Un "reseau" est une banque ou un operateur mobile money precis (ex. M-PESA au Kenya).
+
+```bash
+curl "https://threewfpayment.onrender.com/v1/networks" \
+  -H "Authorization: Bearer <token>"
+```
 
 ```json
 [
@@ -24,8 +34,9 @@ Un "reseau" est une banque ou un operateur mobile money precis (ex. M-PESA au Ke
 
 Un "channel" represente une combinaison pays/devise/type/sens de paiement disponible. **C'est `channel_id` que vous devez fournir dans une requete de depot/retrait.** Filtres disponibles en query params : `country_id`, `channel_type`, `ramp_type` (`deposit` | `withdraw`).
 
-```
-GET /v1/channels?ramp_type=deposit&channel_type=momo&country_id=b661bb73-fcbf-45cb-b317-79db87a1b3d2
+```bash
+curl "https://threewfpayment.onrender.com/v1/channels?ramp_type=deposit&channel_type=momo&country_id=b661bb73-fcbf-45cb-b317-79db87a1b3d2" \
+  -H "Authorization: Bearer <token>"
 ```
 
 ```json
@@ -47,6 +58,11 @@ GET /v1/channels?ramp_type=deposit&channel_type=momo&country_id=b661bb73-fcbf-45
 `channel_type` observes en pratique : `bank`, `momo`, `eft`, `p2p`, `spenn`, `virtualbank`, `phone` — ce n'est **pas** une liste figee, traitez-la comme informative plutot que comme un enum strict cote client. Respectez `min_amount`/`max_amount` (un `0.00` sur `max_amount` signifie generalement "pas de plafond documente", mais restez prudent et validez cote Yellow Card via un premier test en sandbox).
 
 ## `GET /v1/currencies`
+
+```bash
+curl "https://threewfpayment.onrender.com/v1/currencies" \
+  -H "Authorization: Bearer <token>"
+```
 
 ```json
 [
