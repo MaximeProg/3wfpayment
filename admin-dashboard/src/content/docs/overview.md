@@ -6,12 +6,11 @@
 
 ## URL de base
 
-| Environnement | URL |
-|---|---|
-| **Production** | `https://threewfpayment.onrender.com` |
-| Developpement local | `http://localhost:8000` |
+```
+https://threewfpayment.onrender.com
+```
 
-Tous les exemples de ce guide utilisent l'URL de production. Tous les endpoints d'integration vivent sous le prefixe `/v1` (ex. `https://threewfpayment.onrender.com/v1/deposits`) — c'est un prefixe de version d'API, pas un dossier de documentation.
+C'est l'unique URL a utiliser pour integrer Payment Platform — inutile de faire tourner quoi que ce soit en local, l'API est deja en ligne. Tous les endpoints d'integration vivent sous le prefixe `/v1` (ex. `https://threewfpayment.onrender.com/v1/deposits`) — c'est un prefixe de version d'API, pas un dossier de documentation.
 
 ## Demarrage rapide
 
