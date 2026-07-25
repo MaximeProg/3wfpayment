@@ -1,0 +1,3 @@
+`POST /v1/crypto-sends` existe dans l'API (envoi depuis le solde Yellow Card vers une adresse crypto externe) mais **cette fonctionnalite est actuellement mise en pause cote produit** : le scope `crypto_sends:write` n'est accorde a aucun projet par defaut, et l'integration Yellow Card sous-jacente n'a pas encore ete validee de bout en bout en sandbox.
+
+**Ne construisez pas d'integration dependant de cet endpoint sans en parler d'abord a l'equipe plateforme.** Si votre produit a besoin d'envoyer des paiements crypto, contactez [l'equipe plateforme](/docs/resources) pour evaluer l'etat d'avancement avant de demarrer.

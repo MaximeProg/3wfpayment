@@ -1,0 +1,1 @@
+cd "e:/3wfgemticashpayment/api" && ".venv/Scripts/python.exe" -m uvicorn app.main:app --port 8000
