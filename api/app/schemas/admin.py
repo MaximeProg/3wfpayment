@@ -83,6 +83,9 @@ class ProjectUpdateRequest(BaseModel):
     name: str | None = None
     description: str | None = None
     status: str | None = Field(None, description="active | inactive | suspended")
+    webhook_url: str | None = Field(
+        None, description="URL du webhook sortant (notifications de changement de statut)"
+    )
 
 
 class ProjectOut(BaseModel):
@@ -94,6 +97,10 @@ class ProjectOut(BaseModel):
     description: str | None
     status: str
     environment: str
+    webhook_url: str | None
+    webhook_secret: str | None = Field(
+        None, description="Dechiffre a la volee pour affichage admin (pas 'affiche une seule fois' comme une cle API)"
+    )
     created_at: datetime
     updated_at: datetime
 

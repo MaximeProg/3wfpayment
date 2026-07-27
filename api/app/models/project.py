@@ -21,6 +21,8 @@ class Project(UUIDPKMixin, TimestampMixin, Base):
     environment: Mapped[Environment] = mapped_column(
         Enum(Environment, name="environment"), default=Environment.sandbox, nullable=False
     )
+    webhook_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    webhook_secret_encrypted: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     api_keys: Mapped[list["ApiKey"]] = relationship(back_populates="project")
 

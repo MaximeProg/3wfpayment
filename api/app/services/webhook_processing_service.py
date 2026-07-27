@@ -37,6 +37,7 @@ from app.repositories import transaction_repository
 from app.repositories import webhook_repository as repo
 from app.services.error_log_service import log_error
 from app.services.notification_service import notify
+from app.services.outbound_webhook_service import deliver_status_update
 from app.services.yellowcard_credentials_service import verify_webhook_and_resolve_environment
 from app.services.yellowcard_status_mapping import is_terminal, map_status
 
@@ -66,8 +67,9 @@ async def _apply_to_transaction(db: AsyncSession, event: WebhookEvent, raw_paylo
     raw_status = raw_payload.get("status")
     status = map_status(raw_status)
     now = datetime.now(timezone.utc) if is_terminal(status) else None
+    previous_status = transaction.status.value
 
-    await transaction_repository.update_status(
+    transaction = await transaction_repository.update_status(
         db,
         transaction,
         new_status=status,
@@ -76,6 +78,9 @@ async def _apply_to_transaction(db: AsyncSession, event: WebhookEvent, raw_paylo
         completed_at=now,
         source=StatusChangeSource.webhook,
     )
+
+    if previous_status != status.value:
+        await deliver_status_update(db, transaction)
 
     if status.value in ("completed", "failed"):
         await notify(

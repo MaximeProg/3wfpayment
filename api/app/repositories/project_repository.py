@@ -44,6 +44,8 @@ async def update(
     name: str | None = None,
     description: str | None = None,
     status: ProjectStatus | None = None,
+    webhook_url: str | None = None,
+    webhook_secret_encrypted: str | None = None,
 ) -> Project:
     if name is not None:
         project.name = name
@@ -51,6 +53,10 @@ async def update(
         project.description = description
     if status is not None:
         project.status = status
+    if webhook_url is not None:
+        project.webhook_url = webhook_url
+    if webhook_secret_encrypted is not None:
+        project.webhook_secret_encrypted = webhook_secret_encrypted
     await db.commit()
     await db.refresh(project)
     return project

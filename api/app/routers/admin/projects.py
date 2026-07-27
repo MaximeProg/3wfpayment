@@ -1,12 +1,15 @@
+import secrets
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.deps import require_admin_role
+from app.core.security import decrypt_secret, encrypt_secret
 from app.db.session import get_db
 from app.models.admin import AdminUser
 from app.models.enums import AdminRole, ApiKeyStatus, AuditActorType, Environment, ProjectStatus
+from app.models.project import Project
 from app.repositories import api_key_repository, audit_repository, project_repository
 from app.schemas.admin import (
     ApiKeyCreatedOut,
@@ -25,13 +28,19 @@ def _client_ip(request: Request) -> str | None:
     return request.client.host if request.client else None
 
 
+def _to_project_out(project: Project) -> ProjectOut:
+    out = ProjectOut.model_validate(project)
+    out.webhook_secret = decrypt_secret(project.webhook_secret_encrypted) if project.webhook_secret_encrypted else None
+    return out
+
+
 @router.get("", response_model=list[ProjectOut])
 async def list_projects(
     db: AsyncSession = Depends(get_db),
     _admin: AdminUser = Depends(require_admin_role(AdminRole.viewer)),
 ) -> list[ProjectOut]:
     projects = await project_repository.list_all(db)
-    return [ProjectOut.model_validate(p) for p in projects]
+    return [_to_project_out(p) for p in projects]
 
 
 @router.post("", response_model=ProjectOut, status_code=status.HTTP_201_CREATED)
@@ -67,7 +76,7 @@ async def create_project_endpoint(
         after={"name": project.name, "slug": project.slug, "environment": project.environment.value},
         ip_address=_client_ip(request),
     )
-    return ProjectOut.model_validate(project)
+    return _to_project_out(project)
 
 
 @router.get("/{project_id}", response_model=ProjectOut)
@@ -79,7 +88,7 @@ async def get_project(
     project = await project_repository.get_by_id(db, project_id)
     if project is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Projet introuvable")
-    return ProjectOut.model_validate(project)
+    return _to_project_out(project)
 
 
 @router.patch("/{project_id}", response_model=ProjectOut)
@@ -94,7 +103,12 @@ async def update_project(
     if project is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Projet introuvable")
 
-    before = {"name": project.name, "description": project.description, "status": project.status.value}
+    before = {
+        "name": project.name,
+        "description": project.description,
+        "status": project.status.value,
+        "webhook_url": project.webhook_url,
+    }
 
     new_status = None
     if payload.status is not None:
@@ -103,8 +117,19 @@ async def update_project(
         except ValueError as exc:
             raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="status invalide") from exc
 
+    # Genere un secret la premiere fois qu'une URL de webhook est renseignee.
+    new_secret_encrypted = None
+    if payload.webhook_url and not project.webhook_secret_encrypted:
+        new_secret_encrypted = encrypt_secret(secrets.token_urlsafe(32))
+
     project = await project_repository.update(
-        db, project, name=payload.name, description=payload.description, status=new_status
+        db,
+        project,
+        name=payload.name,
+        description=payload.description,
+        status=new_status,
+        webhook_url=payload.webhook_url,
+        webhook_secret_encrypted=new_secret_encrypted,
     )
 
     await audit_repository.create(
@@ -115,10 +140,15 @@ async def update_project(
         resource_type="project",
         resource_id=str(project.id),
         before=before,
-        after={"name": project.name, "description": project.description, "status": project.status.value},
+        after={
+            "name": project.name,
+            "description": project.description,
+            "status": project.status.value,
+            "webhook_url": project.webhook_url,
+        },
         ip_address=_client_ip(request),
     )
-    return ProjectOut.model_validate(project)
+    return _to_project_out(project)
 
 
 @router.get("/{project_id}/api-keys", response_model=list[ApiKeyOut])

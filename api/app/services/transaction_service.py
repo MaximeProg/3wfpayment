@@ -31,6 +31,7 @@ from app.repositories import transaction_repository as repo
 from app.schemas.transaction import CryptoSendCreateRequest, DepositCreateRequest, WithdrawalCreateRequest
 from app.services.error_log_service import log_error
 from app.services.notification_service import notify
+from app.services.outbound_webhook_service import deliver_status_update
 from app.services.yellowcard_credentials_service import build_client
 from app.services.yellowcard_status_mapping import is_terminal, map_status
 
@@ -137,7 +138,9 @@ async def create_withdrawal(
         return existing
 
     channel = await _resolve_channel(db, payload.channel_id)
-    destination_network = await _resolve_network(db, payload.destination_network_id)
+    destination_network = (
+        await _resolve_network(db, payload.destination_network_id) if payload.destination_network_id else None
+    )
 
     reference = _new_reference("WDR")
     body: dict[str, Any] = {
@@ -152,7 +155,7 @@ async def create_withdrawal(
             "accountType": payload.destination_account_type,
             "accountNumber": payload.destination_account_number,
             "accountName": payload.destination_account_name,
-            "networkId": destination_network.yellowcard_id,
+            **({"networkId": destination_network.yellowcard_id} if destination_network else {}),
         },
         "sender": payload.sender.model_dump(exclude_none=True),
         "forceAccept": payload.force_accept,
@@ -275,8 +278,9 @@ async def refresh_transaction_status(db: AsyncSession, *, project: Project, tran
 
     status = map_status(response.get("status"))
     now = datetime.now(timezone.utc) if is_terminal(status) else None
+    previous_status = transaction.status.value
 
-    return await repo.update_status(
+    transaction = await repo.update_status(
         db,
         transaction,
         new_status=status,
@@ -285,3 +289,8 @@ async def refresh_transaction_status(db: AsyncSession, *, project: Project, tran
         completed_at=now,
         source=StatusChangeSource.polling,
     )
+
+    if previous_status != status.value:
+        await deliver_status_update(db, transaction)
+
+    return transaction

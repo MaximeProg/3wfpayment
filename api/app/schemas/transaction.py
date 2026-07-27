@@ -65,7 +65,7 @@ class WithdrawalCreateRequest(BaseModel):
     destination_account_type: Literal["bank", "momo"]
     destination_account_number: str
     destination_account_name: str
-    destination_network_id: uuid.UUID = Field(..., description="Voir GET /v1/networks")
+    destination_network_id: uuid.UUID | None = Field(None, description="Requis pour momo (voir GET /v1/networks)")
 
     sender: PersonInfo = Field(..., description="KYC de l'expediteur (le titulaire du wallet)")
     force_accept: bool = True
