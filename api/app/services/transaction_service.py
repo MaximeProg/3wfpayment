@@ -89,7 +89,7 @@ async def create_deposit(db: AsyncSession, *, project: Project, payload: Deposit
             "accountNumber": payload.source_account_number,
             **({"networkId": source_network.yellowcard_id} if source_network else {}),
         },
-        "recipient": payload.recipient.model_dump(exclude_none=True),
+        "recipient": payload.recipient.model_dump(exclude_none=True, by_alias=True),
         "reason": payload.reason,
         "forceAccept": payload.force_accept,
     }
@@ -109,7 +109,7 @@ async def create_deposit(db: AsyncSession, *, project: Project, payload: Deposit
         status=status,
         amount=Decimal(str(response.get("convertedAmount", payload.local_amount))),
         currency_code=payload.currency,
-        customer_payload=payload.recipient.model_dump(exclude_none=True),
+        customer_payload=payload.recipient.model_dump(exclude_none=True, by_alias=True),
         request_payload=body,
         response_payload=response,
         initiated_at=now,
@@ -157,7 +157,7 @@ async def create_withdrawal(
             "accountName": payload.destination_account_name,
             **({"networkId": destination_network.yellowcard_id} if destination_network else {}),
         },
-        "sender": payload.sender.model_dump(exclude_none=True),
+        "sender": payload.sender.model_dump(exclude_none=True, by_alias=True),
         "forceAccept": payload.force_accept,
     }
 
@@ -176,7 +176,7 @@ async def create_withdrawal(
         status=status,
         amount=Decimal(str(response.get("convertedAmount", payload.local_amount))),
         currency_code=payload.currency,
-        customer_payload=payload.sender.model_dump(exclude_none=True),
+        customer_payload=payload.sender.model_dump(exclude_none=True, by_alias=True),
         request_payload=body,
         response_payload=response,
         initiated_at=now,

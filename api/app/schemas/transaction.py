@@ -9,7 +9,16 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 class PersonInfo(BaseModel):
     """KYC minimal transmis a Yellow Card (recipient pour un depot, sender pour un
     retrait). Champs requis selon customer_type - cf. doc Yellow Card Submit
-    Receive/Send Request."""
+    Receive/Send Request.
+
+    Yellow Card attend ces champs en camelCase (idType/idNumber/businessId/
+    businessName) - les alias ci-dessous serialisent correctement vers Yellow
+    Card (via model_dump(by_alias=True)) tout en acceptant en entree soit le nom
+    Python (snake_case, deja utilise par les projets appelants existants) soit
+    l'alias, grace a populate_by_name=True.
+    """
+
+    model_config = ConfigDict(populate_by_name=True)
 
     name: str | None = None
     country: str | None = Field(None, description="ISO 3166, ex: NG, CM, GH")
@@ -17,10 +26,10 @@ class PersonInfo(BaseModel):
     address: str | None = None
     dob: str | None = Field(None, description="mm/dd/yyyy")
     email: str | None = None
-    id_number: str | None = None
-    id_type: str | None = None
-    business_id: str | None = None
-    business_name: str | None = None
+    id_number: str | None = Field(None, alias="idNumber")
+    id_type: str | None = Field(None, alias="idType")
+    business_id: str | None = Field(None, alias="businessId")
+    business_name: str | None = Field(None, alias="businessName")
 
 
 class DepositCreateRequest(BaseModel):
